@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  copy_script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Checkout
+        uses: actions/checkout@master
+
+      - name: Send file on server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATEKEY }}
+          source: "./scripts"
+          target: "~/diplom-server-setup"
+
+  deploy:
+    needs: [ copy_script ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run backend deploy
+        uses: appleboy/ssh-action@master
+        with:
+          script: |
+            cd ~/diplom-server-setup/scripts/
+            bash setup.sh
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATEKEY }}
