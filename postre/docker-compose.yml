@@ -1,39 +1,24 @@
 # docker-compose build
-version: '3.1'
+version: '3'
 
 services:
   postgre_db:
-    image: kartoza/postgis
+    image: kartoza/postgis:11.5-2.8
     container_name: postgre
     volumes:
       - ./pg_data:/var/lib/postgresql
     environment:
-      # If you need to create multiple database you can add coma separated databases eg gis,data
-      - POSTGRES_DB=gis
-      - POSTGRES_USER=${POSTGRES_USER:-docker}
-      - POSTGRES_PASS=${POSTGRES_PASS:-docker}
       - ALLOW_IP_RANGE=0.0.0.0/0
-      # Add extensions you need to be enabled by default in the DB. Default are the five specified below
       - POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgrouting
+    env_file:
+      - pg.env
     ports:
       - 5432:5432
-    restart: on-failure
+    restart: always
     healthcheck:
       test: "exit 0"
 
-  pgadmin:
-    # https://github.com/khezen/compose-postgres/blob/master/docker-compose.yml
-    container_name: pgadmin_container
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
-    volumes:
-       - ./pgadmin_data:/root/.pgadmin
-    ports:
-      - "5433:80"
-    restart: unless-stopped
-
-
 networks:
   default:
+    external:
+      name: diplom

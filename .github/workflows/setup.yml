@@ -5,24 +5,42 @@ on:
     branches: [ main ]
 
 jobs:
-  copy_script:
+  create_envs:
     runs-on: ubuntu-latest
-
+    env:
+      PG_HOST=${{ secrets.PG_HOST }}
+      PG_PORT=${{ secrets.PG_PORT }}
+      PG_DBNAME=${{ secrets.PG_DBNAME }}
+      PG_USER=${{ secrets.PG_USER }}
+      PG_PASSWORD=${{ secrets.PG_PASSWORD }}
     steps:
       - name: Run Checkout
         uses: actions/checkout@master
 
+      - name: Create "pg.env" file
+        uses: cuchi/jinja2-action@v1.2.0
+        with:
+          template: ./postre/pg.env.j2
+          output_file: ./postre/pg.env
+
+      - name: Create "gdal.env" file
+        uses: cuchi/jinja2-action@v1.2.0
+        with:
+          template: ./osm2pgsql/gdal.env.j2
+          output_file: ./osm2pgsql/gdal.env
+
+      # Передаем файлы на сервер
       - name: Send file on server
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATEKEY }}
-          source: "./scripts"
-          target: "~/diplom-server-setup"
+          source: "./"
+          target: "~/${{ github.event.repository.name }}"
 
   deploy:
-    needs: [ copy_script ]
+    needs: [ create_envs ]
     runs-on: ubuntu-latest
 
     steps:
@@ -30,8 +48,12 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           script: |
-            cd ~/diplom-server-setup/scripts/
-            bash setup.sh
+            cd ~/diplom-server-setup/scripts/ &&
+            chmod +x setup.sh &&
+            ./setup.sh &&
+            cd ~/diplom-server-setup/postre &&
+            docker-compose down &&
+            docker-compose up -d
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATEKEY }}

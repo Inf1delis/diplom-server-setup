@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  osm_import:
+    image: osgeo/gdal:ubuntu-full-latest
+    command: "/config/osm2psql.sh /osm/kaliningrad-latest.osm.pbf /config/osmconf.ini"
+    volumes:
+      - ./osm:/osm
+      - ./config:/config
+    env_file:
+      - gdal.env
+
+networks:
+  default:
+    external:
+      name: diplom
