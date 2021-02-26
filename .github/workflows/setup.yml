@@ -8,11 +8,13 @@ jobs:
   create_envs:
     runs-on: ubuntu-latest
     env:
-      PG_HOST: ${{ secrets.PG_HOST }}
+      PG_HOST: ${{ secrets.HOST }}
       PG_PORT: ${{ secrets.PG_PORT }}
       PG_DBNAME: ${{ secrets.PG_DBNAME }}
       PG_USER: ${{ secrets.PG_USER }}
       PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+      PGADMIN_DEFAULT_EMAIL: ${{ secrets.PGADMIN_DEFAULT_EMAIL }}
+      PGADMIN_DEFAULT_PASSWORD: ${{ secrets.PGADMIN_DEFAULT_PASSWORD }}
     steps:
       - name: Run Checkout
         uses: actions/checkout@master
@@ -44,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Run backend deploy
+      - name: Run deploy
         uses: appleboy/ssh-action@master
         with:
           script: |

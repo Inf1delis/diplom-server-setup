@@ -70,6 +70,7 @@ do
     -lco "OVERWRITE=yes" \
     -f 'PostgreSQL' PG:"host='$PG_HOST' port='$PG_PORT' dbname='$PG_DBNAME' user='$PG_USER' password='$PG_PASSWORD'" \
     "$OSMNAME" \
+    -sql "select AsGeoJSON(geometry) AS geometry, $osm_fields, replace(all_tags,X'0A','') as all_tags from $ogrtype where ST_IsValid(geometry) = 1" \
     --config OGR_INTERLEAVED_READING YES \
     --config OSM_CONFIG_FILE "$OGRCONFIG" \
     --config GDAL_CACHEMAX 2000 \
