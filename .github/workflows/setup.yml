@@ -55,7 +55,9 @@ jobs:
             ./setup.sh &&
             cd ~/diplom-server-setup/postre &&
             docker-compose down &&
-            docker-compose up -d
+            docker-compose up -d &&
+            docker-compose -f docker-compose.pgadmin.yml down &&
+            docker-compose -f docker-compose.pgadmin.yml up -d
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.PRIVATEKEY }}

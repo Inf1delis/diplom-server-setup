@@ -6,10 +6,6 @@ services:
     # https://github.com/khezen/compose-postgres/blob/master/docker-compose.yml
     container_name: pgadmin
     image: dpage/pgadmin4
-    network_mode: host
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
     volumes:
        - ./pgadmin_data:/root/.pgadmin
     env_file:
